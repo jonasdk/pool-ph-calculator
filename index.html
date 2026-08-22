@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>Pool pH</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; manifest-src 'self'; connect-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#EEF6FA">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -125,8 +127,26 @@ const PRODUCTS = [
 const K1=Math.pow(10,-6.35), K2=Math.pow(10,-10.33), KW=1e-14;
 const alkFrac=pH=>{const H=Math.pow(10,-pH); const D=H*H+K1*H+K1*K2; return {a:(K1*H+2*K1*K2)/D, extra:KW/H-H};};
 
-let state = {product:'hcl', conc:{}};
-try{ Object.assign(state, JSON.parse(localStorage.getItem('poolph')||'{}')); }catch(e){}
+const IDS=PRODUCTS.map(p=>p.id);
+const numStr=(v,max)=>typeof v==='string'&&v.length<=12&&/^[\d.,]*$/.test(v)&&parseFloat(v.replace(/\./g,'').replace(',','.'))<=max?v:null;
+const posNum=(v,max)=>typeof v==='number'&&isFinite(v)&&v>0&&v<=max?v:null;
+
+let state={product:'hcl', conc:{}, vol:null, ta:null, target:null, cya:null, taDate:null};
+function load(){
+  let raw; try{ raw=JSON.parse(localStorage.getItem('poolph')||'{}'); }catch(e){ return; }
+  if(!raw||typeof raw!=='object'||Array.isArray(raw)) return;
+  if(IDS.includes(raw.product)) state.product=raw.product;
+  if(raw.conc&&typeof raw.conc==='object') IDS.forEach(id=>{ const v=posNum(raw.conc[id],100); if(v!==null) state.conc[id]=v; });
+  state.vol=numStr(raw.vol,10000000);
+  state.ta=numStr(raw.ta,1000);
+  state.target=numStr(raw.target,14);
+  if(raw.cya&&typeof raw.cya==='object'&&raw.cya.on===true){
+    const a=numStr(raw.cya.alk,1000), c=numStr(raw.cya.cya,1000);
+    if(a!==null&&c!==null) state.cya={on:true,alk:a,cya:c};
+  }
+  if(typeof raw.taDate==='string'&&!isNaN(Date.parse(raw.taDate))) state.taDate=raw.taDate;
+}
+load();
 PRODUCTS.forEach(p=>{ if(state.conc[p.id]==null) state.conc[p.id]=p.conc; });
 
 const $=id=>document.getElementById(id);
@@ -142,7 +162,17 @@ function formatVol(){
 }
 
 function renderChips(){
-  $('chips').innerHTML = PRODUCTS.map(p=>`<div class="chip ${p.id===state.product?'on':''}" data-id="${p.id}">${p.name}<small>${p.sub||'&nbsp;'}</small></div>`).join('');
+  const box=$('chips'); box.textContent='';
+  PRODUCTS.forEach(p=>{
+    const el=document.createElement('div');
+    el.className='chip'+(p.id===state.product?' on':'');
+    el.dataset.id=p.id;
+    el.appendChild(document.createTextNode(p.name));
+    const sm=document.createElement('small');
+    sm.textContent=p.sub||'\u00A0';
+    el.appendChild(sm);
+    box.appendChild(el);
+  });
   const p=PRODUCTS.find(x=>x.id===state.product);
   $('concLabel').textContent = p.name + ' koncentration';
   $('conc').value = String(state.conc[p.id]).replace('.',',');
