@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Pool pH</title>
+<meta name="theme-color" content="#07202B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pool pH">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{
+  --bg:#07202B; --card:#0E2F3C; --line:#17445A; --ink:#E8F3F5; --dim:#7FA7B5; --water:#1FA7C4; --warn:#F2B950;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--ink);font:16px/1.3 -apple-system,system-ui,sans-serif;overflow:hidden}
+body{display:flex;flex-direction:column;height:100dvh;padding:max(env(safe-area-inset-top),14px) 16px max(env(safe-area-inset-bottom),14px);gap:12px}
+h1{font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+h1 em{font-style:normal;font-weight:400;letter-spacing:.02em;text-transform:none;font-size:12px;color:#5C8494}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.field{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.field label{display:block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+.field input{width:100%;background:none;border:0;color:var(--ink);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;outline:none;padding-top:2px}
+.field input:focus{color:var(--water)}
+.big{background:var(--card);border:2px solid var(--water);border-radius:16px;padding:12px 14px}
+.big label{display:block;font-size:12px;color:var(--water);text-transform:uppercase;letter-spacing:.08em}
+.big input{width:100%;background:none;border:0;color:var(--ink);font-size:44px;font-weight:700;font-variant-numeric:tabular-nums;outline:none;line-height:1.1}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.chip{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 8px;color:var(--dim);font-size:14px;font-weight:600;text-align:center;cursor:pointer}
+.chip.on{border-color:var(--water);color:var(--ink);background:#123B4B}
+.chip small{display:block;font-weight:400;font-size:11px;margin-top:2px}
+.field{position:relative}
+.calcbtn{position:absolute;bottom:6px;right:6px;width:24px;height:24px;border:1px solid var(--line);background:#0A2733;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--dim)}
+.calcbtn.on{border-color:var(--water);color:var(--water);background:#123B4B}
+.calcbtn svg{width:14px;height:14px}
+#ta{padding-right:26px}
+#ta.locked{color:var(--water)}
+.sheet{position:fixed;inset:0;background:rgba(4,15,20,.92);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:none;flex-direction:column;justify-content:center;gap:14px;padding:24px 18px calc(24px + env(safe-area-inset-bottom));z-index:10}
+.sheet.show{display:flex}
+.sheet h2{font-size:15px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--water)}
+.sheet p{font-size:13px;line-height:1.45;color:var(--dim)}
+.formula{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-size:15px;font-weight:600;color:var(--ink)}
+.formula b{color:var(--water)}
+.out{background:var(--card);border:2px solid var(--water);border-radius:14px;padding:12px;text-align:center}
+.out span{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums}
+.out small{display:block;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:14px;font-size:15px;font-weight:600;font-family:inherit}
+.btn.primary{background:var(--water);border-color:var(--water);color:#052029}
+.btn.wide{grid-column:1/-1;color:var(--dim);background:none}
+.conc{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--dim);padding:0 4px}
+.conc input{width:64px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-size:15px;padding:4px 8px;text-align:right;outline:none}
+.result{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--card);border-radius:20px;border:1px solid var(--line);text-align:center;padding:8px;min-height:0}
+.result .num{font-size:clamp(64px,22vw,104px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.result .unit{font-size:28px;font-weight:600;color:var(--water);margin-top:2px}
+.result .note{font-size:13px;color:var(--dim);margin-top:10px;min-height:1.2em}
+.result.zero .num{color:var(--dim)}
+.result.split .note{color:var(--warn)}
+</style>
+</head>
+<body>
+<h1>Pool pH<em id="stamp"></em></h1>
+
+<div class="grid">
+  <div class="field"><label>Volumen L</label><input id="vol" inputmode="numeric" value="50.000"></div>
+  <div class="field"><label>Alkalinitet ppm</label><input id="ta" inputmode="numeric" value="175">
+    <button class="calcbtn" id="calcbtn" aria-label="Korriger for cyanursyre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h8"/></svg></button>
+  </div>
+  <div class="field"><label>Mål pH</label><input id="target" inputmode="decimal" value="7,1"></div>
+</div>
+
+<div class="big"><label>Aktuel pH</label><input id="ph" inputmode="decimal" placeholder="7,6" autofocus></div>
+
+<div class="chips" id="chips"></div>
+<div class="conc"><span id="concLabel"></span><span><input id="conc" inputmode="decimal"> %</span></div>
+
+<div class="result" id="result">
+  <div class="num" id="num">–</div>
+  <div class="unit" id="unit"></div>
+  <div class="note" id="note"></div>
+</div>
+
+<div class="sheet" id="sheet">
+  <h2>Korriger for cyanursyre</h2>
+  <p>Cyanursyre indgår i den alkalinitet testeren måler, men bidrager ikke til karbonatbufferen. Måler du begge dele med din pooltester, kan du trække bidraget fra og få det tal, doseringen faktisk skal regnes ud fra.</p>
+  <div class="grid">
+    <div class="field"><label>Målt Alk ppm</label><input id="mAlk" inputmode="numeric"></div>
+    <div class="field"><label>CyA ppm</label><input id="mCya" inputmode="numeric"></div>
+    <div class="out"><small>Karbonat</small><span id="mOut">–</span></div>
+  </div>
+  <div class="formula">Karbonat = Alk − (CyA × <b>0,32</b>)</div>
+  <p>Faktoren 0,32 gælder omkring pH 7,2-7,8. Alkalinitet og cyanursyre er to separate tests med hver sin tablet, men begge ændrer sig langsomt, så det er nok at måle dem ved sæsonstart og efter større vandpåfyldning.</p>
+  <div class="btns">
+    <button class="btn" id="sCancel">Annuller</button>
+    <button class="btn primary" id="sUse">Brug værdi</button>
+    <button class="btn wide" id="sOff">Slå korrektion fra</button>
+  </div>
+</div>
+
+<script>
+const PRODUCTS = [
+  {id:'hcl', name:'Saltsyre', sub:'flydende', conc:30, liquid:true,
+    eqPerL:c=>{const d=1+0.005*c; return d*1000*c/100/36.46;}},
+  {id:'nabs', name:'pH-minus granulat', sub:'natriumbisulfat', conc:100, liquid:false,
+    eqPerKg:c=>(c/100)*1000/120.06},
+  {id:'h2so4', name:'pH-minus flydende', sub:'svovlsyre', conc:15, liquid:true,
+    eqPerL:c=>{const d=1+0.0067*c; return d*1000*c/100/98.08*2;}},
+  {id:'h3po4', name:'Phosphorsyre', sub:'', conc:75, liquid:true,
+    eqPerL:(c,pH)=>{const d=1+0.0077*c; const f=1+1/(1+Math.pow(10,7.2-pH)); return d*1000*c/100/98.0*f;}}
+];
+const K1=Math.pow(10,-6.35), K2=Math.pow(10,-10.33), KW=1e-14;
+const alkFrac=pH=>{const H=Math.pow(10,-pH); const D=H*H+K1*H+K1*K2; return {a:(K1*H+2*K1*K2)/D, extra:KW/H-H};};
+
+let state = {product:'hcl', conc:{}};
+try{ Object.assign(state, JSON.parse(localStorage.getItem('poolph')||'{}')); }catch(e){}
+PRODUCTS.forEach(p=>{ if(state.conc[p.id]==null) state.conc[p.id]=p.conc; });
+
+const $=id=>document.getElementById(id);
+const num=s=>parseFloat(String(s).replace(',','.'));
+const fmt=(v,d)=>v.toLocaleString('da-DK',{minimumFractionDigits:d,maximumFractionDigits:d});
+const digits=s=>String(s).replace(/\D/g,'');
+const group=s=>s?Number(s).toLocaleString('da-DK'):'';
+function formatVol(){
+  const el=$('vol'), before=digits(el.value.slice(0,el.selectionStart||0)).length;
+  el.value=group(digits(el.value));
+  let i=0,n=0; while(i<el.value.length&&n<before){ if(/\d/.test(el.value[i]))n++; i++; }
+  try{ el.setSelectionRange(i,i); }catch(e){}
+}
+
+function renderChips(){
+  $('chips').innerHTML = PRODUCTS.map(p=>`<div class="chip ${p.id===state.product?'on':''}" data-id="${p.id}">${p.name}<small>${p.sub||'&nbsp;'}</small></div>`).join('');
+  const p=PRODUCTS.find(x=>x.id===state.product);
+  $('concLabel').textContent = p.name + ' koncentration';
+  $('conc').value = String(state.conc[p.id]).replace('.',',');
+}
+function stampNow(){ state.taDate=new Date().toISOString(); }
+function renderStamp(){
+  if(!state.taDate){ $('stamp').textContent=''; return; }
+  const d=new Date(state.taDate);
+  const days=Math.floor((Date.now()-d)/864e5);
+  const dato=d.toLocaleDateString('da-DK',{day:'numeric',month:'short'});
+  $('stamp').textContent = 'Alk målt '+dato+(days>60?' ('+days+' dage)':'');
+  $('stamp').style.color = days>90 ? 'var(--warn)' : '';
+}
+function save(){
+  try{ localStorage.setItem('poolph', JSON.stringify({product:state.product, conc:state.conc, vol:$('vol').value, ta:$('ta').value, target:$('target').value, cya:state.cya, taDate:state.taDate})); }catch(e){}
+}
+function calc(){
+  const V=Number(digits($('vol').value)), TA=num($('ta').value), pt=num($('target').value), pa=num($('ph').value);
+  const p=PRODUCTS.find(x=>x.id===state.product), c=num($('conc').value);
+  const r=$('result'); r.className='result';
+  if(!(V>0&&TA>0&&pt>0&&pa>0&&c>0)){ $('num').textContent='–'; $('unit').textContent=''; $('note').textContent=''; r.classList.add('zero'); return; }
+  if(pa<=pt){ $('num').textContent='0'; $('unit').textContent=''; $('note').textContent='pH er allerede på eller under mål'; r.classList.add('zero'); return; }
+  const f1=alkFrac(pa), f2=alkFrac(pt);
+  const alk1=TA/50000;
+  const CT=(alk1-f1.extra)/f1.a;
+  const alk2=CT*f2.a+f2.extra;
+  const eq=(alk1-alk2)*V;
+  let txt,unit,note='';
+  if(p.liquid){
+    const L=eq/p.eqPerL(c,pt);
+    if(L<0.1){txt=fmt(L*1000,0);unit='mL';}
+    else if(L<1){txt=fmt(L*10,1);unit='dL';}
+    else {txt=fmt(L,2);unit='L';}
+    if(L>5){note='Del i 2-3 portioner, mål igen efter hver'; r.classList.add('split');}
+  } else {
+    const kg=eq/p.eqPerKg(c);
+    if(kg<1){txt=fmt(kg*1000,0);unit='g';} else {txt=fmt(kg,2);unit='kg';}
+    if(kg>2){note='Del i 2-3 portioner, mål igen efter hver'; r.classList.add('split');}
+  }
+  $('num').textContent=txt; $('unit').textContent=unit; $('note').textContent=note;
+}
+
+renderChips();
+if(state.vol) $('vol').value=group(digits(state.vol));
+if(state.ta) $('ta').value=state.ta;
+if(state.target) $('target').value=state.target;
+
+const cya={on:false,alk:'',cya:''};
+Object.assign(cya, state.cya||{});
+function corrected(){ const a=num($('mAlk').value), c=num($('mCya').value); if(!(a>0)||!(c>=0)) return null; return Math.max(0, a-c*0.32); }
+function sheetCalc(){ const v=corrected(); $('mOut').textContent = v==null?'–':fmt(v,0); }
+function applyCya(){
+  $('calcbtn').classList.toggle('on', cya.on);
+  $('ta').classList.toggle('locked', cya.on);
+  $('ta').readOnly = cya.on;
+}
+if(cya.on){ $('mAlk').value=cya.alk; $('mCya').value=cya.cya; const v=corrected(); if(v!=null) $('ta').value=fmt(v,0); }
+applyCya();
+
+$('calcbtn').addEventListener('click',()=>{ sheetCalc(); $('sheet').classList.add('show'); $('mAlk').focus(); });
+['mAlk','mCya'].forEach(id=>$(id).addEventListener('input',sheetCalc));
+$('sCancel').addEventListener('click',()=>$('sheet').classList.remove('show'));
+$('sUse').addEventListener('click',()=>{
+  const v=corrected(); if(v==null) return;
+  cya.on=true; cya.alk=$('mAlk').value; cya.cya=$('mCya').value;
+  $('ta').value=fmt(v,0); state.cya=cya; stampNow(); renderStamp(); applyCya(); save(); calc();
+  $('sheet').classList.remove('show');
+});
+$('sOff').addEventListener('click',()=>{
+  cya.on=false; state.cya=cya; applyCya(); save();
+  $('sheet').classList.remove('show');
+});
+
+$('chips').addEventListener('click',e=>{
+  const el=e.target.closest('.chip'); if(!el) return;
+  state.product=el.dataset.id; renderChips(); save(); calc();
+});
+$('conc').addEventListener('input',()=>{ const v=num($('conc').value); if(v>0){state.conc[state.product]=v; save();} calc(); });
+$('vol').addEventListener('input',()=>{ formatVol(); save(); calc(); });
+['target','ph'].forEach(id=>$(id).addEventListener('input',()=>{save();calc();}));
+$('ta').addEventListener('input',()=>{ stampNow(); renderStamp(); save(); calc(); });
+addEventListener('pagehide',save);
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) save(); else renderStamp(); });
+if(navigator.storage&&navigator.storage.persist) navigator.storage.persist();
+renderStamp();
+document.addEventListener('keydown',e=>{ if(e.key==='Enter') document.activeElement.blur(); });
+calc();
+
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
