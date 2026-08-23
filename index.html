@@ -14,60 +14,65 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <style>
 :root{
-  --bg:#F2F7FA; --card:#FFFFFF; --line:#DDE9F0; --ink:#0D2B3A; --dim:#6C8B9B;
-  --water:#0A84C4; --water-soft:#E8F4FB; --warn:#B26A00;
+  --bg:#F2F7FA; --card:#FFFFFF; --line:#DDE9F0; --ink:#0D2B3A; --dim:#456A7B;
+  --water:#0A78AC; --water-soft:#E8F4FB; --warn:#B26A00;
   --shadow:0 1px 2px rgba(13,43,58,.05), 0 4px 16px rgba(13,43,58,.06);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg);color:var(--ink);font:16px/1.3 -apple-system,system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
 body{display:flex;flex-direction:column;height:100dvh;padding:max(env(safe-area-inset-top),16px) 16px max(env(safe-area-inset-bottom),16px);gap:10px;
   background-image:radial-gradient(120% 60% at 50% 0%, #E4F1F9 0%, var(--bg) 60%)}
+h1 .ver{font-size:10.5px;font-weight:600;letter-spacing:.04em;color:#7C99A8;background:#E7EFF4;border-radius:6px;padding:2px 6px;margin-left:6px}
+h1 .left{display:flex;align-items:center}
 h1{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:0 2px}
-h1 em{font-style:normal;font-weight:500;letter-spacing:0;text-transform:none;font-size:12px;color:#93AEBC}
+h1 em{font-style:normal;font-weight:600;letter-spacing:0;text-transform:none;font-size:12.5px;color:#5C7F90}
 
 .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .field{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:9px 11px;box-shadow:var(--shadow)}
-.field label{display:block;font-size:10px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
 .field input{width:100%;background:none;border:0;color:var(--ink);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;outline:none;padding-top:3px;letter-spacing:-.01em}
 .field input:focus{color:var(--water)}
 
-.calcbtn{position:absolute;bottom:7px;right:7px;width:24px;height:24px;border:1px solid var(--line);background:#F6FAFC;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#9DB6C4}
+.calcbtn{position:absolute;bottom:6px;right:6px;width:26px;height:26px;border:1px solid #C9DDE8;background:#EFF6FA;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#4E7488}
 .calcbtn.on{border-color:var(--water);color:#fff;background:var(--water)}
-.calcbtn svg{width:13px;height:13px}
-#ta{padding-right:26px}
+.calcbtn svg{width:14px;height:14px}
+#ta{padding-right:28px}
 #ta.locked{color:var(--water)}
 
 .big{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
 .big::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--water)}
 .big label{display:block;font-size:11px;font-weight:600;color:var(--water);text-transform:uppercase;letter-spacing:.08em}
 .big input{width:100%;background:none;border:0;color:var(--ink);font-size:46px;font-weight:700;font-variant-numeric:tabular-nums;outline:none;line-height:1.08;letter-spacing:-.03em}
-.big input::placeholder{color:#C6D8E2}
+.big input::placeholder{color:#A8C3D2}
 
 .chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .chip{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:9px 8px;color:var(--dim);font-size:14px;font-weight:600;text-align:center;box-shadow:var(--shadow);transition:.15s}
 .chip.on{border-color:var(--water);color:var(--water);background:var(--water-soft);box-shadow:0 0 0 3px rgba(10,132,196,.10)}
-.chip small{display:block;font-weight:500;font-size:10.5px;margin-top:1px;opacity:.75}
+.chip small{display:block;font-weight:600;font-size:12px;margin-top:2px;color:#5C7F90}
 
-.conc{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--dim);padding:0 4px}
+.conc{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:600;color:var(--dim);padding:0 4px}
 .conc input{width:62px;background:var(--card);border:1px solid var(--line);border-radius:9px;color:var(--ink);font-size:15px;font-weight:600;padding:5px 8px;text-align:right;outline:none}
 
 .result{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:22px;text-align:center;padding:8px;min-height:0;
-  background:linear-gradient(160deg,#37B4DC 0%,#0A72B4 100%);color:#fff;box-shadow:0 6px 24px rgba(10,114,180,.28)}
-.result .num{font-size:clamp(60px,21vw,102px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.035em}
-.result .unit{font-size:26px;font-weight:600;opacity:.85;margin-top:1px}
-.result .note{font-size:12.5px;opacity:.85;margin-top:10px;min-height:1.2em;padding:0 12px}
+  background:linear-gradient(160deg,#0A78AC 0%,#065488 100%);color:#fff;box-shadow:0 6px 22px rgba(6,84,136,.30)}
+.result .what{font-size:clamp(30px,8.5vw,40px);font-weight:800;letter-spacing:-.02em;margin-bottom:10px;padding:7px 20px;border-radius:999px;background:rgba(4,50,80,.28);color:#fff;line-height:1.1;max-width:100%}
+.result.zero .what{background:#E7F0F5;color:#33586A}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.result .num{font-size:clamp(56px,19vw,94px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.035em}
+.result .unit{font-size:28px;font-weight:700;color:#fff;margin-top:2px}
+.result .note{font-size:14px;font-weight:600;color:#fff;margin-top:12px;min-height:1.2em;padding:0 14px;line-height:1.35}
 .result.zero{background:var(--card);color:var(--dim);border:1px solid var(--line);box-shadow:var(--shadow)}
-.result.zero .num{color:#C6D8E2}
+.result.zero .num{color:#9FBECD}
 
 .sheet{position:fixed;inset:0;background:rgba(238,246,250,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:none;flex-direction:column;justify-content:center;gap:14px;padding:24px 18px calc(24px + env(safe-area-inset-bottom));z-index:10}
 .sheet.show{display:flex}
 .sheet h2{font-size:19px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
-.sheet p{font-size:13px;line-height:1.5;color:var(--dim)}
+.sheet p{font-size:14px;line-height:1.5;color:#3E606F}
 .formula{background:var(--water-soft);border:1px solid #CDE6F5;border-radius:13px;padding:13px;text-align:center;font-size:15px;font-weight:600;color:var(--ink)}
 .formula b{color:var(--water)}
 .out{background:var(--water);border-radius:14px;padding:10px 8px;text-align:center;color:#fff;box-shadow:0 4px 14px rgba(10,132,196,.28)}
 .out span{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.out small{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;opacity:.85}
+.out small{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:13px;padding:14px;font-size:15px;font-weight:600;font-family:inherit;box-shadow:var(--shadow)}
 .btn.primary{background:var(--water);border-color:var(--water);color:#fff;box-shadow:0 4px 14px rgba(10,132,196,.3)}
@@ -75,33 +80,35 @@ h1 em{font-style:normal;font-weight:500;letter-spacing:0;text-transform:none;fon
 </style>
 </head>
 <body>
-<h1>Pool pH<em id="stamp"></em></h1>
+<h1><span class="left">Pool pH<span class="ver">v1.1</span></span><em id="stamp"></em></h1>
 
 <div class="grid">
-  <div class="field"><label>Volumen L</label><input id="vol" inputmode="numeric" value="50.000"></div>
-  <div class="field"><label>Alkalinitet ppm</label><input id="ta" inputmode="numeric" value="175">
+  <div class="field"><label for="vol">Volumen L</label><input id="vol" inputmode="numeric" value="50.000"></div>
+  <div class="field"><label for="ta">Alkalinitet ppm</label><input id="ta" inputmode="numeric" value="175">
     <button class="calcbtn" id="calcbtn" aria-label="Korriger for cyanursyre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h8"/></svg></button>
   </div>
-  <div class="field"><label>Mål pH</label><input id="target" inputmode="decimal" value="7,1"></div>
+  <div class="field"><label for="target">Mål pH</label><input id="target" inputmode="decimal" value="7,1"></div>
 </div>
 
-<div class="big"><label>Aktuel pH</label><input id="ph" inputmode="decimal" placeholder="7,6" autofocus></div>
+<div class="big"><label for="ph">Aktuel pH</label><input id="ph" inputmode="decimal" placeholder="7,6" autofocus></div>
 
-<div class="chips" id="chips"></div>
-<div class="conc"><span id="concLabel"></span><span><input id="conc" inputmode="decimal"> %</span></div>
+<div class="chips" id="chips" role="radiogroup" aria-label="Vælg middel"></div>
+<div class="conc"><span id="concLabel"></span><span><input id="conc" inputmode="decimal" aria-label="Koncentration i procent"> %</span></div>
 
 <div class="result" id="result">
+  <div class="what" id="what"></div>
   <div class="num" id="num">–</div>
   <div class="unit" id="unit"></div>
   <div class="note" id="note"></div>
+  <div class="sr" id="say" role="status" aria-live="polite" aria-atomic="true"></div>
 </div>
 
 <div class="sheet" id="sheet">
   <h2>Korriger for cyanursyre</h2>
   <p>Cyanursyre indgår i den alkalinitet testeren måler, men bidrager ikke til karbonatbufferen. Måler du begge dele med din pooltester, kan du trække bidraget fra og få det tal, doseringen faktisk skal regnes ud fra.</p>
   <div class="grid">
-    <div class="field"><label>Målt Alk ppm</label><input id="mAlk" inputmode="numeric"></div>
-    <div class="field"><label>CyA ppm</label><input id="mCya" inputmode="numeric"></div>
+    <div class="field"><label for="mAlk">Målt Alk ppm</label><input id="mAlk" inputmode="numeric"></div>
+    <div class="field"><label for="mCya">CyA ppm</label><input id="mCya" inputmode="numeric"></div>
     <div class="out"><small>Karbonat</small><span id="mOut">–</span></div>
   </div>
   <div class="formula">Karbonat = Alk − (CyA × <b>0,32</b>)</div>
@@ -167,6 +174,10 @@ function renderChips(){
     const el=document.createElement('div');
     el.className='chip'+(p.id===state.product?' on':'');
     el.dataset.id=p.id;
+    el.setAttribute('role','radio');
+    el.setAttribute('tabindex','0');
+    el.setAttribute('aria-checked', p.id===state.product?'true':'false');
+    el.setAttribute('aria-label', p.name+(p.sub?', '+p.sub:''));
     el.appendChild(document.createTextNode(p.name));
     const sm=document.createElement('small');
     sm.textContent=p.sub||'\u00A0';
@@ -193,8 +204,10 @@ function calc(){
   const V=Number(digits($('vol').value)), TA=num($('ta').value), pt=num($('target').value), pa=num($('ph').value);
   const p=PRODUCTS.find(x=>x.id===state.product), c=num($('conc').value);
   const r=$('result'); r.className='result';
-  if(!(V>0&&TA>0&&pt>0&&pa>0&&c>0)){ $('num').textContent='–'; $('unit').textContent=''; $('note').textContent=''; r.classList.add('zero'); return; }
-  if(pa<=pt){ $('num').textContent='0'; $('unit').textContent=''; $('note').textContent='pH er allerede på eller under mål'; r.classList.add('zero'); return; }
+  const navn=p.name+(p.sub?' ('+p.sub+')':'')+' '+fmt(c,0)+' %';
+  $('what').textContent=p.name+' '+fmt(c,0)+' %';
+  if(!(V>0&&TA>0&&pt>0&&pa>0&&c>0)){ $('num').textContent='–'; $('unit').textContent=''; $('note').textContent=''; $('say').textContent=''; r.classList.add('zero'); return; }
+  if(pa<=pt){ $('num').textContent='0'; $('unit').textContent=''; $('note').textContent='pH er allerede på eller under mål'; $('say').textContent='pH er allerede på eller under målet. Ingen '+navn+' skal tilsættes.'; r.classList.add('zero'); return; }
   const f1=alkFrac(pa), f2=alkFrac(pt);
   const alk1=TA/50000;
   const CT=(alk1-f1.extra)/f1.a;
@@ -213,6 +226,8 @@ function calc(){
     if(kg>2){note='Del i 2-3 portioner, mål igen efter hver'; r.classList.add('split');}
   }
   $('num').textContent=txt; $('unit').textContent=unit; $('note').textContent=note;
+  const enhed={mL:'milliliter',dL:'deciliter',L:'liter',g:'gram',kg:'kilo'}[unit]||unit;
+  $('say').textContent=txt+' '+enhed+' '+navn+', for at gå fra pH '+fmt(pa,2)+' til '+fmt(pt,2)+' i '+group(digits($('vol').value))+' liter'+(note?'. '+note:'');
 }
 
 renderChips();
