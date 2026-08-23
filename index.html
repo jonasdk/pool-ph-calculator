@@ -45,6 +45,29 @@ h1 em{font-style:normal;font-weight:600;letter-spacing:0;text-transform:none;fon
 .big input{width:100%;background:none;border:0;color:var(--ink);font-size:46px;font-weight:700;font-variant-numeric:tabular-nums;outline:none;line-height:1.08;letter-spacing:-.03em}
 .big input::placeholder{color:#A8C3D2}
 
+.big{cursor:text}
+.big.empty{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:var(--shadow)}50%{box-shadow:0 0 0 4px rgba(10,120,172,.16)}}
+@media (prefers-reduced-motion:reduce){.big.empty{animation:none;box-shadow:0 0 0 3px rgba(10,120,172,.16)}}
+.big .hint{position:absolute;right:16px;top:50%;transform:translateY(-30%);font-size:13px;font-weight:700;color:var(--water);display:none;align-items:center;gap:5px}
+.big.empty .hint{display:flex}
+.big .hint svg{width:15px;height:15px}
+
+h1 .tools{display:flex;align-items:center;gap:8px}
+.iconbtn{width:28px;height:28px;border-radius:9px;border:1px solid #C9DDE8;background:#EFF6FA;color:#3E606F;font-size:15px;font-weight:800;font-family:inherit;display:flex;align-items:center;justify-content:center}
+
+.sheet.scroll{justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;gap:0}
+.sheet.scroll h2{margin-bottom:4px}
+.sheet.scroll h3{font-size:15px;font-weight:700;color:var(--water);margin:18px 0 6px}
+.sheet.scroll p{margin-bottom:8px}
+.sheet.scroll ol,.sheet.scroll ul{margin:0 0 8px 18px;font-size:14px;line-height:1.5;color:#3E606F}
+.sheet.scroll li{margin-bottom:5px}
+.sheet.scroll .box{background:var(--water-soft);border:1px solid #CDE6F5;border-radius:12px;padding:12px;margin:6px 0 8px}
+.sheet.scroll .box.risk{background:#FFF4E5;border-color:#F3D6A8}
+.sheet.scroll .box p{margin:0;color:#33586A}
+.sheet.scroll .box.risk p{color:#7A4B00}
+.sheet.scroll b{color:var(--ink)}
+.closebar{position:sticky;bottom:0;padding:12px 0 0;background:linear-gradient(180deg,rgba(238,246,250,0) 0%,rgba(238,246,250,.98) 35%)}
 .chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .chip{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:9px 8px;color:var(--dim);font-size:14px;font-weight:600;text-align:center;box-shadow:var(--shadow);transition:.15s}
 .chip.on{border-color:var(--water);color:var(--water);background:var(--water-soft);box-shadow:0 0 0 3px rgba(10,132,196,.10)}
@@ -80,17 +103,20 @@ h1 em{font-style:normal;font-weight:600;letter-spacing:0;text-transform:none;fon
 </style>
 </head>
 <body>
-<h1><span class="left">Pool pH<span class="ver">v1.1</span></span><em id="stamp"></em></h1>
+<h1><span class="left">Pool pH<span class="ver">v1.2</span></span>
+  <span class="tools"><em id="stamp"></em><button class="iconbtn" id="infobtn" aria-label="Sådan gør du">?</button></span></h1>
 
 <div class="grid">
   <div class="field"><label for="vol">Volumen L</label><input id="vol" inputmode="numeric" value="50.000"></div>
   <div class="field"><label for="ta">Alkalinitet ppm</label><input id="ta" inputmode="numeric" value="175">
     <button class="calcbtn" id="calcbtn" aria-label="Korriger for cyanursyre"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h8"/></svg></button>
   </div>
-  <div class="field"><label for="target">Mål pH</label><input id="target" inputmode="decimal" value="7,1"></div>
+  <div class="field"><label for="target">Ønsket pH</label><input id="target" inputmode="decimal" value="7,1"></div>
 </div>
 
-<div class="big"><label for="ph">Aktuel pH</label><input id="ph" inputmode="decimal" placeholder="7,6" autofocus></div>
+<div class="big" id="bigbox"><label for="ph">Målt pH nu</label><input id="ph" inputmode="decimal" placeholder="7,6" autofocus>
+  <span class="hint" aria-hidden="true">Tast her <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+</div>
 
 <div class="chips" id="chips" role="radiogroup" aria-label="Vælg middel"></div>
 <div class="conc"><span id="concLabel"></span><span><input id="conc" inputmode="decimal" aria-label="Koncentration i procent"> %</span></div>
@@ -118,6 +144,51 @@ h1 em{font-style:normal;font-weight:600;letter-spacing:0;text-transform:none;fon
     <button class="btn primary" id="sUse">Brug værdi</button>
     <button class="btn wide" id="sOff">Slå korrektion fra</button>
   </div>
+</div>
+
+<div class="sheet scroll" id="info">
+  <h2>Sådan gør du</h2>
+  <p>Du kan altid komme tilbage hertil med spørgsmålstegnet øverst.</p>
+
+  <h3>De tre begreber</h3>
+  <p><b>pH</b> er hvor sur eller basisk vandet er. Skalaen går fra 0 til 14, hvor 7 er neutralt. Poolvand skal ligge mellem 7,0 og 7,4. For højt pH gør kloren næsten virkningsløs og giver kalkbelægninger. For lavt pH svider i øjnene og tærer på pumpe, fliser og fuger.</p>
+  <p><b>Alkalinitet</b> er vandets modstand mod at ændre pH, ofte kaldet bufferen. Den måles i ppm og er grunden til at det er mængden af syre, ikke poolens størrelse alene, der afgør dosis. Er alkaliniteten høj, skal der meget mere syre til for det samme fald.</p>
+  <p><b>Cyanursyre</b> beskytter kloren mod sollys og kommer fra stabiliserede klortabletter. Den tæller fejlagtigt med i den alkalinitet testeren måler, og derfor kan den trækkes fra med regnemaskinen i appen.</p>
+
+  <h3>Sådan måler du</h3>
+  <ol>
+    <li>Tænd pumpen og lad den køre i mindst en time, så vandet er blandet.</li>
+    <li>Tag vandprøven i skyggen, midt i poolen, cirka en albue nede. Ikke ved indløbet.</li>
+    <li>Skyl testerens kammer i poolvand først, aldrig i vandhanen.</li>
+    <li>Rør ikke tabletten med fingrene. Tryk den ud af folien direkte ned i vandet.</li>
+    <li>Aflæs pH. Alkalinitet og cyanursyre behøver kun måles ved sæsonstart og efter større vandpåfyldning.</li>
+  </ol>
+  <div class="box"><p>Er pH over 8,4 eller under 6,5, kan testeren ikke måle det. Så viser den blot yderpunktet, og dosis bliver et gæt. Tilsæt en forsigtig portion, vent, og mål igen.</p></div>
+
+  <h3>Sådan doserer du</h3>
+  <ol>
+    <li>Indtast den målte pH i appen. De øvrige felter husker sig selv.</li>
+    <li>Lad pumpen køre under hele doseringen og mindst fire timer efter.</li>
+    <li><b>Flydende syre:</b> fyld en spand halvt med poolvand, hæld syren i spanden, aldrig omvendt. Hæld langsomt ud langs kanten i den dybe ende, mens du går rundt.</li>
+    <li><b>Granulat:</b> opløs i en spand poolvand og rør rundt, inden det hældes ud. Kast det aldrig tørt i poolen, det synker og ætser bunden.</li>
+    <li>Vent fire til seks timer, mål igen, og gentag hvis der mangler.</li>
+  </ol>
+  <div class="box"><p>Ved store doser deler appen selv beskeden op. Tilsæt aldrig hele mængden på én gang. Det er lettere at tilsætte mere end at rette et for lavt pH.</p></div>
+
+  <h3>Sikkerhed</h3>
+  <ul>
+    <li>Altid syre i vand, aldrig vand i syre. Det modsatte kan koge og sprøjte.</li>
+    <li>Bland aldrig syre med klor, hverken i samme spand eller kort efter hinanden. Det udvikler giftig klorgas.</li>
+    <li>Handsker og briller på. Stænk på huden skylles straks med rigeligt vand.</li>
+    <li>Ingen må bade før tidligst fire timer efter, og pH er målt igen.</li>
+    <li>Opbevar syre og klor hver for sig, tørt, aflåst og utilgængeligt for børn.</li>
+  </ul>
+  <div class="box risk"><p>Kommer der syre i øjnene, skyl med rindende lunkent vand i mindst femten minutter og ring 112. Tag emballagen med.</p></div>
+
+  <h3>Hvis pH bliver ved med at stige</h3>
+  <p>Så er alkaliniteten sandsynligvis for høj. Sænk den ved at dosere til pH omkring 7,0, lufte vandet kraftigt med dyse eller fontæne, og gentage. Luftningen driver kulsyre af, så pH stiger igen, mens alkaliniteten bliver nede. Det tager nogle omgange, men derefter holder pH sig selv i ro.</p>
+
+  <div class="closebar"><button class="btn primary" id="iClose" style="width:100%">Luk</button></div>
 </div>
 
 <script>
@@ -247,6 +318,13 @@ function applyCya(){
 if(cya.on){ $('mAlk').value=cya.alk; $('mCya').value=cya.cya; const v=corrected(); if(v!=null) $('ta').value=fmt(v,0); }
 applyCya();
 
+function hintUpd(){ $('bigbox').classList.toggle('empty', !$('ph').value.trim()); }
+hintUpd();
+$('bigbox').addEventListener('click',()=>$('ph').focus());
+$('ph').addEventListener('input',hintUpd);
+$('infobtn').addEventListener('click',()=>{ $('info').classList.add('show'); $('info').scrollTop=0; });
+$('iClose').addEventListener('click',()=>$('info').classList.remove('show'));
+
 $('calcbtn').addEventListener('click',()=>{ sheetCalc(); $('sheet').classList.add('show'); $('mAlk').focus(); });
 ['mAlk','mCya'].forEach(id=>$(id).addEventListener('input',sheetCalc));
 $('sCancel').addEventListener('click',()=>$('sheet').classList.remove('show'));
@@ -272,6 +350,7 @@ $('ta').addEventListener('input',()=>{ stampNow(); renderStamp(); save(); calc()
 addEventListener('pagehide',save);
 document.addEventListener('visibilitychange',()=>{ if(document.hidden) save(); else renderStamp(); });
 if(navigator.storage&&navigator.storage.persist) navigator.storage.persist();
+setTimeout(()=>{ try{ $('ph').focus({preventScroll:true}); }catch(e){} },60);
 renderStamp();
 document.addEventListener('keydown',e=>{ if(e.key==='Enter') document.activeElement.blur(); });
 calc();
