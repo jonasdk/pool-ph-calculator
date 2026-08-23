@@ -100,10 +100,58 @@ h1 .tools{display:flex;align-items:center;gap:8px}
 .btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:13px;padding:14px;font-size:15px;font-weight:600;font-family:inherit;box-shadow:var(--shadow)}
 .btn.primary{background:var(--water);border-color:var(--water);color:#fff;box-shadow:0 4px 14px rgba(10,132,196,.3)}
 .btn.wide{grid-column:1/-1;color:var(--dim);background:none;border:none;box-shadow:none;font-weight:500}
+
+@media (orientation:landscape) and (max-height:600px){
+  body{
+    display:grid;
+    grid-template-columns:1.02fr .98fr;
+    grid-template-rows:auto auto auto auto 1fr;
+    column-gap:14px; row-gap:8px; align-content:start;
+    padding:max(env(safe-area-inset-top),10px) max(env(safe-area-inset-right),16px) max(env(safe-area-inset-bottom),10px) max(env(safe-area-inset-left),16px);
+  }
+  h1{grid-column:1/-1;grid-row:1}
+  .grid{grid-column:1;grid-row:2}
+  .big{grid-column:1;grid-row:3}
+  .chips{grid-column:1;grid-row:4}
+  .conc{grid-column:1;grid-row:5;align-self:start}
+  .result{grid-column:2;grid-row:2/-1;min-height:0}
+
+  .field{padding:7px 10px;border-radius:12px}
+  .field label{font-size:10px}
+  .field input{font-size:17px}
+  .calcbtn{width:22px;height:22px;bottom:5px;right:5px}
+  .calcbtn svg{width:12px;height:12px}
+  #ta{padding-right:24px}
+
+  .big{padding:8px 14px;border-radius:15px}
+  .big label{font-size:10px}
+  .big input{font-size:clamp(26px,9vh,38px)}
+  .big .hint{font-size:12px;right:12px}
+
+  .chip{padding:7px 6px;border-radius:11px;font-size:13px}
+  .chip small{font-size:11px;margin-top:0}
+  .conc{font-size:12.5px}
+  .conc input{padding:3px 7px;font-size:14px}
+
+  .result{border-radius:18px;padding:10px}
+  .result .what{font-size:clamp(18px,5.4vh,30px);padding:5px 14px;margin-bottom:6px}
+  .result .num{font-size:clamp(40px,15vh,78px)}
+  .result .unit{font-size:clamp(18px,5vh,24px)}
+  .result .note{font-size:12.5px;margin-top:8px;padding:0 10px}
+
+  .sheet{justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 18px calc(16px + env(safe-area-inset-bottom))}
+  .sheet h2{font-size:17px}
+  .sheet p{font-size:13px}
+  .sheet .btns{margin-top:4px}
+  .btn{padding:11px;font-size:14px}
+}
+@media (orientation:landscape) and (max-height:600px) and (min-width:820px){
+  .result .num{font-size:clamp(48px,17vh,92px)}
+}
 </style>
 </head>
 <body>
-<h1><span class="left">Pool pH<span class="ver">v1.2</span></span>
+<h1><span class="left">Pool pH<span class="ver">v1.3</span></span>
   <span class="tools"><em id="stamp"></em><button class="iconbtn" id="infobtn" aria-label="Sådan gør du">?</button></span></h1>
 
 <div class="grid">

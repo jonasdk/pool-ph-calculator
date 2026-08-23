@@ -1,6 +1,6 @@
 # Pool pH
 
-Version 1.2
+Version 1.3
 
 Læg alle filer i samme mappe på en webserver med HTTPS (fx GitHub Pages).
 Åbn siden i Safari på iPhone → Del → "Føj til hjemmeskærm". Herefter virker appen offline.
